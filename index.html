@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced SWP Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --danger-color: #ea4335;
+            --warning-color: #fbbc05;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --animation-duration: 0.3s;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            background-color: #f9f9f9;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            animation: fadeInDown var(--animation-duration) ease-out;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+            animation: fadeIn var(--animation-duration) ease-out;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid var(--light-gray);
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            animation: fadeIn var(--animation-duration) ease-out;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: all var(--animation-duration) ease;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+            transform: scale(1.01);
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-group input {
+            flex: 1;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .input-group .input-addon {
+            padding: 10px 12px;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            border-left: none;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all var(--animation-duration) ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        
+        button:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        button:hover {
+            background-color: #3367d6;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button.secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        button.secondary:hover {
+            background-color: #2d9249;
+        }
+        
+        button.danger {
+            background-color: var(--danger-color);
+        }
+        
+        button.danger:hover {
+            background-color: #d33426;
+        }
+        
+        button.warning {
+            background-color: var(--warning-color);
+            color: var(--dark-gray);
+        }
+        
+        button.warning:hover {
+            background-color: #e6ac00;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .button-group button {
+            flex: 1;
+        }
+        
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            transition: all var(--animation-duration) ease;
+        }
+        
+        .tab:hover {
+            color: var(--primary-color);
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn var(--animation-duration) ease-out;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        #chart-container {
+            height: 300px;
+            margin-bottom: 20px;
+            animation: fadeIn var(--animation-duration) ease-out;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            animation: fadeIn var(--animation-duration) ease-out;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            transition: background-color var(--animation-duration) ease;
+        }
+        
+        th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: rgba(66, 133, 244, 0.05);
+        }
+        
+        .warning {
+            color: var(--danger-color);
+            font-weight: 600;
+            padding: 15px;
+            background-color: rgba(234, 67, 53, 0.1);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn var(--animation-duration) ease-out;
+        }
+        
+        .warning svg {
+            flex-shrink: 0;
+        }
+        
+        .success {
+            color: var(--secondary-color);
+            font-weight: 600;
+            padding: 15px;
+            background-color: rgba(52, 168, 83, 0.1);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn var(--animation-duration) ease-out;
+        }
+        
+        .success svg {
+            flex-shrink: 0;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            animation: fadeIn var(--animation-duration) ease-out;
+        }
+        
+        .summary-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 15px;
+            text-align: center;
+            transition: all var(--animation-duration) ease;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .summary-card h3 {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .summary-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .history-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all var(--animation-duration) ease;
+        }
+        
+        .history-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .history-item h3 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .history-item p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            animation: fadeIn var(--animation-duration) ease-out;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity var(--animation-duration) ease;
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .rate-periods {
+            margin-bottom: 15px;
+        }
+        
+        .rate-period {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            animation: fadeIn var(--animation-duration) ease-out;
+        }
+        
+        .rate-period input {
+            flex: 1;
+        }
+        
+        .rate-period button {
+            padding: 8px 12px;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 1;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+        
+        @keyframes bounceIn {
+            from, 20%, 40%, 60%, 80%, to {
+                animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+            }
+            0% {
+                opacity: 0;
+                transform: scale3d(.3, .3, .3);
+            }
+            20% {
+                transform: scale3d(1.1, 1.1, 1.1);
+            }
+            40% {
+                transform: scale3d(.9, .9, .9);
+            }
+            60% {
+                opacity: 1;
+                transform: scale3d(1.03, 1.03, 1.03);
+            }
+            80% {
+                transform: scale3d(.97, .97, .97);
+            }
+            to {
+                opacity: 1;
+                transform: scale3d(1, 1, 1);
+            }
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.75s;
+        }
+        
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Advanced SWP Calculator</h1>
+        <p>Plan your Systematic Withdrawal Plan with inflation, tax, and variable return rate considerations</p>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Investment Details</h2>
+            
+            <div class="form-group">
+                <label for="investment">
+                    Initial Investment Amount (₹)
+                    <span class="tooltip">?
+                        <span class="tooltiptext">Enter the total amount you're investing initially</span>
+                    </span>
+                </label>
+                <div class="input-group">
+                    <input type="number" id="investment" placeholder="e.g. 1000000" min="0" step="1000">
+                    <span class="input-addon">₹</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="frequency">Withdrawal Frequency</label>
+                <select id="frequency">
+                    <option value="12">Monthly</option>
+                    <option value="4">Quarterly</option>
+                    <option value="1">Yearly</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="withdrawal">
+                    Initial Withdrawal Amount (₹)
+                    <span class="tooltip">?
+                        <span class="tooltiptext">Amount you plan to withdraw in the first period</span>
+                    </span>
+                </label>
+                <div class="input-group">
+                    <input type="number" id="withdrawal" placeholder="e.g. 10000" min="0" step="100">
+                    <span class="input-addon">₹</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="duration">Investment Duration (years)</label>
+                <input type="number" id="duration" placeholder="e.g. 10" min="1" max="50" step="1">
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="inflationCheck"> Adjust withdrawals for inflation
+                </label>
+            </div>
+            
+            <div id="inflationDetails" class="hidden">
+                <div class="form-group">
+                    <label for="inflationRate">
+                        Expected Inflation Rate (%)
+                        <span class="tooltip">?
+                            <span class="tooltiptext">Annual rate at which withdrawals will increase</span>
+                        </span>
+                    </label>
+                    <div class="input-group">
+                        <input type="number" id="inflationRate" placeholder="e.g. 6" min="0" max="20" step="0.1" value="6">
+                        <span class="input-addon">%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="taxCheck"> Include tax calculation
+                </label>
+            </div>
+            
+            <div id="taxDetails" class="hidden">
+                <div class="form-group">
+                    <label for="taxRate">
+                        Tax Rate on Withdrawals (%)
+                        <span class="tooltip">?
+                            <span class="tooltiptext">Tax rate applied to your withdrawals</span>
+                        </span>
+                    </label>
+                    <div class="input-group">
+                        <input type="number" id="taxRate" placeholder="e.g. 10" min="0" max="50" step="0.1" value="10">
+                        <span class="input-addon">%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h2>Return Rate</h2>
+            
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="returnType" id="fixedReturn" checked> Fixed Return Rate
+                </label>
+                <label>
+                    <input type="radio" name="returnType" id="variableReturn"> Variable Return Rates
+                </label>
+            </div>
+            
+            <div id="fixedReturnDetails">
+                <div class="form-group">
+                    <label for="returnRate">
+                        Expected Annual Return Rate (%)
+                        <span class="tooltip">?
+                            <span class="tooltiptext">Fixed annual return rate for the entire duration</span>
+                        </span>
+                    </label>
+                    <div class="input-group">
+                        <input type="number" id="returnRate" placeholder="e.g. 8" min="0" max="30" step="0.1" value="8">
+                        <span class="input-addon">%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="variableReturnDetails" class="hidden">
+                <div class="form-group">
+                    <label>Define return rates for different periods</label>
+                    <div class="rate-periods" id="ratePeriods">
+                        <div class="rate-period">
+                            <input type="number" class="rate-from" placeholder="From year" min="0" step="1" value="0">
+                            <input type="number" class="rate-to" placeholder="To year" min="1" step="1" value="5">
+                            <input type="number" class="rate-value" placeholder="Rate %" min="0" max="30" step="0.1" value="8">
+                            <button class="danger remove-rate">×</button>
+                        </div>
+                        <div class="rate-period">
+                            <input type="number" class="rate-from" placeholder="From year" min="0" step="1" value="5">
+                            <input type="number" class="rate-to" placeholder="To year" min="1" step="1" value="10">
+                            <input type="number" class="rate-value" placeholder="Rate %" min="0" max="30" step="0.1" value="7">
+                            <button class="danger remove-rate">×</button>
+                        </div>
+                    </div>
+                    <button id="addRatePeriod" class="secondary">+ Add Period</button>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button id="calculateBtn" class="primary pulse">Calculate SWP</button>
+                <button id="resetBtn" class="danger">Reset</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div id="results" class="hidden">
+                <div class="tab-container">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="summary">Summary</div>
+                        <div class="tab" data-tab="schedule">Withdrawal Schedule</div>
+                        <div class="tab" data-tab="history">History</div>
+                    </div>
+                    
+                    <div id="summary" class="tab-content active">
+                        <div id="chart-container">
+                            <canvas id="corpusChart"></canvas>
+                        </div>
+                        
+                        <div id="resultWarning" class="warning hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <span id="warningText"></span>
+                        </div>
+                        
+                        <div id="resultSuccess" class="success hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span id="successText"></span>
+                        </div>
+                        
+                        <div class="summary-cards">
+                            <div class="summary-card">
+                                <h3>Initial Investment</h3>
+                                <div class="value" id="summaryInitial">₹0</div>
+                            </div>
+                            <div class="summary-card">
+                                <h3>Total Withdrawals</h3>
+                                <div class="value" id="summaryWithdrawals">₹0</div>
+                            </div>
+                            <div class="summary-card">
+                                <h3>Final Corpus</h3>
+                                <div class="value" id="summaryCorpus">₹0</div>
+                            </div>
+                            <div class="summary-card">
+                                <h3>Total Interest</h3>
+                                <div class="value" id="summaryInterest">₹0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button id="exportPdfBtn" class="secondary">Export to PDF</button>
+                            <button id="exportCsvBtn" class="secondary">Export to CSV</button>
+                        </div>
+                    </div>
+                    
+                    <div id="schedule" class="tab-content">
+                        <div class="form-group">
+                            <label for="scheduleFilter">Filter by Year:</label>
+                            <select id="scheduleFilter">
+                                <option value="all">All Years</option>
+                            </select>
+                        </div>
+                        
+                        <div style="overflow-x: auto;">
+                            <table id="scheduleTable">
+                                <thead>
+                                    <tr>
+                                        <th>Period</th>
+                                        <th>Withdrawal</th>
+                                        <th>Tax</th>
+                                        <th>Net Withdrawal</th>
+                                        <th>Interest</th>
+                                        <th>Corpus</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scheduleBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="history" class="tab-content">
+                        <h3>Saved Calculations</h3>
+                        <div id="historyList"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Calculating your SWP plan...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const inflationCheck = document.getElementById('inflationCheck');
+        const inflationDetails = document.getElementById('inflationDetails');
+        const taxCheck = document.getElementById('taxCheck');
+        const taxDetails = document.getElementById('taxDetails');
+        const fixedReturn = document.getElementById('fixedReturn');
+        const variableReturn = document.getElementById('variableReturn');
+        const fixedReturnDetails = document.getElementById('fixedReturnDetails');
+        const variableReturnDetails = document.getElementById('variableReturnDetails');
+        const ratePeriods = document.getElementById('ratePeriods');
+        const addRatePeriod = document.getElementById('addRatePeriod');
+        const results = document.getElementById('results');
+        const loading = document.getElementById('loading');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const scheduleFilter = document.getElementById('scheduleFilter');
+        const exportPdfBtn = document.getElementById('exportPdfBtn');
+        const exportCsvBtn = document.getElementById('exportCsvBtn');
+        const historyList = document.getElementById('historyList');
+        
+        // Chart variables
+        let corpusChart;
+        
+        // Initialize the app
+        function init() {
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Add animation to the calculate button
+            calculateBtn.classList.add('pulse');
+            
+            // Load any saved history
+            loadHistory();
+        }
+        
+        // Set up all event listeners
+        function setupEventListeners() {
+            inflationCheck.addEventListener('change', toggleInflationDetails);
+            taxCheck.addEventListener('change', toggleTaxDetails);
+            fixedReturn.addEventListener('change', toggleReturnType);
+            variableReturn.addEventListener('change', toggleReturnType);
+            addRatePeriod.addEventListener('click', addRatePeriodHandler);
+            calculateBtn.addEventListener('click', calculateSWP);
+            resetBtn.addEventListener('click', resetForm);
+            
+            // Add event listeners to existing remove buttons
+            document.querySelectorAll('.remove-rate').forEach(button => {
+                button.addEventListener('click', removeRatePeriod);
+            });
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', switchTab);
+            });
+            
+            scheduleFilter.addEventListener('change', filterSchedule);
+            exportPdfBtn.addEventListener('click', exportToPdf);
+            exportCsvBtn.addEventListener('click', exportToCsv);
+        }
+        
+        // Toggle inflation details visibility
+        function toggleInflationDetails() {
+            inflationDetails.classList.toggle('hidden', !inflationCheck.checked);
+        }
+        
+        // Toggle tax details visibility
+        function toggleTaxDetails() {
+            taxDetails.classList.toggle('hidden', !taxCheck.checked);
+        }
+        
+        // Toggle between fixed and variable return types
+        function toggleReturnType() {
+            fixedReturnDetails.classList.toggle('hidden', !fixedReturn.checked);
+            variableReturnDetails.classList.toggle('hidden', fixedReturn.checked);
+        }
+        
+        // Add a new rate period
+        function addRatePeriodHandler() {
+            const lastPeriod = ratePeriods.lastElementChild;
+            const lastToYear = lastPeriod.querySelector('.rate-to').value;
+            
+            const newPeriod = document.createElement('div');
+            newPeriod.className = 'rate-period';
+            newPeriod.innerHTML = `
+                <input type="number" class="rate-from" placeholder="From year" min="0" step="1" value="${lastToYear}">
+                <input type="number" class="rate-to" placeholder="To year" min="1" step="1" value="${parseInt(lastToYear) + 5}">
+                <input type="number" class="rate-value" placeholder="Rate %" min="0" max="30" step="0.1" value="8">
+                <button class="danger remove-rate">×</button>
+            `;
+            ratePeriods.appendChild(newPeriod);
+            
+            // Add event listener to new remove button
+            newPeriod.querySelector('.remove-rate').addEventListener('click', removeRatePeriod);
+        }
+        
+        // Remove a rate period
+        function removeRatePeriod() {
+            if (ratePeriods.children.length > 1) {
+                this.parentElement.classList.add('hidden');
+                setTimeout(() => {
+                    ratePeriods.removeChild(this.parentElement);
+                }, 300); // Match this with animation duration
+            } else {
+                alert('You need at least one rate period');
+            }
+        }
+        
+        // Main calculation function
+        function calculateSWP() {
+            // Show loading animation
+            results.classList.add('hidden');
+            loading.classList.remove('hidden');
+            
+            // Add click animation to button
+            calculateBtn.classList.remove('pulse');
+            calculateBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                calculateBtn.style.transform = '';
+                calculateBtn.classList.add('pulse');
+            }, 150);
+            
+            // Use setTimeout to allow UI to update before heavy calculation
+            setTimeout(() => {
+                try {
+                    // Get input values
+                    const investment = parseFloat(document.getElementById('investment').value);
+                    const frequency = parseInt(document.getElementById('frequency').value);
+                    const initialWithdrawal = parseFloat(document.getElementById('withdrawal').value);
+                    const duration = parseInt(document.getElementById('duration').value);
+                    const inflationEnabled = inflationCheck.checked;
+                    const inflationRate = inflationEnabled ? parseFloat(document.getElementById('inflationRate').value) / 100 : 0;
+                    const taxEnabled = taxCheck.checked;
+                    const taxRate = taxEnabled ? parseFloat(document.getElementById('taxRate').value) / 100 : 0;
+                    
+                    // Get return rate configuration
+                    let returnRates = [];
+                    if (fixedReturn.checked) {
+                        const fixedRate = parseFloat(document.getElementById('returnRate').value) / 100;
+                        returnRates.push({ fromYear: 0, toYear: duration, rate: fixedRate });
+                    } else {
+                        // Get variable rates
+                        const rateElements = document.querySelectorAll('.rate-period');
+                        rateElements.forEach(el => {
+                            const fromYear = parseFloat(el.querySelector('.rate-from').value);
+                            const toYear = parseFloat(el.querySelector('.rate-to').value);
+                            const rate = parseFloat(el.querySelector('.rate-value').value) / 100;
+                            
+                            if (fromYear >= 0 && toYear > fromYear && rate >= 0) {
+                                returnRates.push({ fromYear, toYear, rate });
+                            }
+                        });
+                        
+                        // Sort by fromYear
+                        returnRates.sort((a, b) => a.fromYear - b.fromYear);
+                        
+                        // Validate coverage
+                        if (returnRates.length === 0 || returnRates[0].fromYear > 0 || 
+                            returnRates[returnRates.length - 1].toYear < duration) {
+                            throw new Error('Return rate periods must cover the entire investment duration');
+                        }
+                    }
+                    
+                    // Validate inputs
+                    if (isNaN(investment) || investment <= 0) {
+                        throw new Error('Please enter a valid initial investment amount');
+                    }
+                    
+                    if (isNaN(initialWithdrawal) || initialWithdrawal <= 0) {
+                        throw new Error('Please enter a valid withdrawal amount');
+                    }
+                    
+                    if (isNaN(duration) || duration <= 0) {
+                        throw new Error('Please enter a valid investment duration');
+                    }
+                    
+                    if (initialWithdrawal * frequency > investment * 0.1) {
+                        // Warning but not error - just inform user
+                        console.warn('Withdrawal amount seems high compared to investment');
+                    }
+                    
+                    // Calculate
+                    let corpus = investment;
+                    const periods = duration * frequency;
+                    let schedule = [];
+                    let depletedPeriod = null;
+                    let totalWithdrawals = 0;
+                    let totalInterest = 0;
+                    let totalTax = 0;
+                    
+                    // Prepare year filter options
+                    scheduleFilter.innerHTML = '<option value="all">All Years</option>';
+                    for (let y = 1; y <= duration; y++) {
+                        scheduleFilter.innerHTML += `<option value="${y}">Year ${y}</option>`;
+                    }
+                    
+                    for (let i = 1; i <= periods; i++) {
+                        // Calculate current period (0-based)
+                        const currentPeriod = i - 1;
+                        const currentYear = Math.floor(currentPeriod / frequency);
+                        
+                        // Get current return rate
+                        let periodicRate = 0;
+                        for (const rate of returnRates) {
+                            if (currentYear >= rate.fromYear && currentYear < rate.toYear) {
+                                periodicRate = rate.rate / frequency;
+                                break;
+                            }
+                        }
+                        
+                        // Calculate interest for this period
+                        const interest = corpus * periodicRate;
+                        totalInterest += interest;
+                        
+                        // Calculate withdrawal amount (with inflation if enabled)
+                        let withdrawalAmount = initialWithdrawal;
+                        if (inflationEnabled) {
+                            withdrawalAmount = initialWithdrawal * Math.pow(1 + inflationRate, currentYear);
+                        }
+                        
+                        // Calculate tax
+                        let taxAmount = 0;
+                        if (taxEnabled) {
+                            taxAmount = withdrawalAmount * taxRate;
+                            totalTax += taxAmount;
+                        }
+                        
+                        const netWithdrawal = withdrawalAmount - taxAmount;
+                        totalWithdrawals += netWithdrawal;
+                        
+                        // Update corpus
+                        corpus = corpus + interest - withdrawalAmount;
+                        
+                        // Record period data
+                        schedule.push({
+                            period: i,
+                            year: currentYear + 1,
+                            withdrawal: withdrawalAmount,
+                            tax: taxAmount,
+                            netWithdrawal: netWithdrawal,
+                            interest: interest,
+                            corpus: corpus > 0 ? corpus : 0,
+                            frequency: frequency
+                        });
+                        
+                        if (corpus <= 0 && depletedPeriod === null) {
+                            depletedPeriod = i;
+                            corpus = 0;
+                            // Break if corpus is depleted to avoid negative values
+                            break;
+                        }
+                    }
+                    
+                    // Display results with animation
+                    setTimeout(() => {
+                        displayResults(schedule, investment, totalWithdrawals, totalInterest, totalTax, corpus, depletedPeriod, periods);
+                        loading.classList.add('hidden');
+                        results.classList.remove('hidden');
+                        results.classList.add('bounce-in');
+                    }, 100);
+                    
+                    // Save to history
+                    saveToHistory({
+                        investment,
+                        frequency,
+                        initialWithdrawal,
+                        duration,
+                        inflationEnabled,
+                        inflationRate,
+                        taxEnabled,
+                        taxRate,
+                        returnRates,
+                        schedule,
+                        totalWithdrawals,
+                        totalInterest,
+                        totalTax,
+                        finalCorpus: corpus,
+                        depletedPeriod,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                } catch (error) {
+                    loading.classList.add('hidden');
+                    alert(error.message);
+                    console.error(error);
+                }
+            }, 100);
+        }
+        
+        // Display calculation results
+        function displayResults(schedule, investment, totalWithdrawals, totalInterest, totalTax, corpus, depletedPeriod, totalPeriods) {
+            // Update summary cards with animation
+            document.getElementById('summaryInitial').textContent = `₹${investment.toLocaleString('en-IN')}`;
+            document.getElementById('summaryWithdrawals').textContent = `₹${totalWithdrawals.toLocaleString('en-IN')}`;
+            document.getElementById('summaryCorpus').textContent = `₹${corpus.toLocaleString('en-IN')}`;
+            document.getElementById('summaryInterest').textContent = `₹${totalInterest.toLocaleString('en-IN')}`;
+            
+            // Animate summary cards
+            document.querySelectorAll('.summary-card').forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.animation = 'fadeInDown 0.4s ease-out';
+                    setTimeout(() => {
+                        card.style.animation = '';
+                    }, 400);
+                }, index * 100);
+            });
+            
+            // Show warning/success message
+            const warningDiv = document.getElementById('resultWarning');
+            const successDiv = document.getElementById('resultSuccess');
+            
+            if (depletedPeriod) {
+                const years = (depletedPeriod / frequency).toFixed(1);
+                warningDiv.classList.remove('hidden');
+                successDiv.classList.add('hidden');
+                document.getElementById('warningText').textContent = 
+                    `Warning: Your corpus will be depleted after ${depletedPeriod} withdrawals (${years} years).`;
+            } else {
+                warningDiv.classList.add('hidden');
+                successDiv.classList.remove('hidden');
+                document.getElementById('successText').textContent = 
+                    `Your corpus will last for the entire ${totalPeriods} withdrawal periods (${duration} years).`;
+            }
+            
+            // Update schedule table
+            updateScheduleTable(schedule);
+            
+            // Create chart
+            createChart(schedule);
+        }
+        
+        // Update the withdrawal schedule table
+        function updateScheduleTable(schedule) {
+            const tbody = document.getElementById('scheduleBody');
+            tbody.innerHTML = '';
+            
+            schedule.forEach((period, index) => {
+                setTimeout(() => {
+                    const row = document.createElement('tr');
+                    row.style.animation = 'fadeIn 0.3s ease-out';
+                    row.innerHTML = `
+                        <td>${period.period}</td>
+                        <td>₹${period.withdrawal.toFixed(2)}</td>
+                        <td>₹${period.tax.toFixed(2)}</td>
+                        <td>₹${period.netWithdrawal.toFixed(2)}</td>
+                        <td>₹${period.interest.toFixed(2)}</td>
+                        <td>₹${period.corpus.toFixed(2)}</td>
+                    `;
+                    tbody.appendChild(row);
+                    
+                    // Remove animation after it completes
+                    setTimeout(() => {
+                        row.style.animation = '';
+                    }, 300);
+                }, index * 20); // Stagger the animations
+            });
+        }
+        
+        // Filter schedule by year
+        function filterSchedule() {
+            const year = scheduleFilter.value;
+            const rows = document.querySelectorAll('#scheduleBody tr');
+            
+            rows.forEach(row => {
+                if (year === 'all') {
+                    row.style.display = '';
+                    row.style.animation = 'fadeIn 0.3s ease-out';
+                } else {
+                    const rowPeriod = parseInt(row.cells[0].textContent);
+                    const frequency = parseInt(document.getElementById('frequency').value);
+                    const rowYear = Math.ceil(rowPeriod / frequency);
+                    const display = parseInt(year) >= rowYear ? '' : 'none';
+                    row.style.display = display;
+                    if (display === '') {
+                        row.style.animation = 'fadeIn 0.3s ease-out';
+                    }
+                }
+            });
+        }
+        
+        // Create the corpus chart
+        function createChart(schedule) {
+            const ctx = document.getElementById('corpusChart').getContext('2d');
+            
+            // Destroy previous chart if exists
+            if (corpusChart) {
+                corpusChart.destroy();
+            }
+            
+            // Prepare data
+            const labels = schedule.map((_, i) => `Period ${i + 1}`);
+            const corpusData = schedule.map(p => p.corpus);
+            const withdrawalData = schedule.map(p => p.netWithdrawal);
+            
+            corpusChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Remaining Corpus',
+                            data: corpusData,
+                            borderColor: '#4285f4',
+                            backgroundColor: 'rgba(66, 133, 244, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Withdrawals',
+                            data: withdrawalData,
+                            borderColor: '#34a853',
+                            backgroundColor: 'rgba(52, 168, 83, 0.1)',
+                            borderWidth: 2,
+                            fill: false,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Corpus (₹)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Withdrawal (₹)'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += '₹' + context.parsed.y.toFixed(2).toLocaleString('en-IN');
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Export to PDF
+        function exportToPdf() {
+            // Add click animation
+            exportPdfBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                exportPdfBtn.style.transform = '';
+            }, 150);
+            
+            alert('PDF export functionality would be implemented here with jsPDF');
+            /*
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(18);
+            doc.text('SWP Calculation Report', 105, 15, { align: 'center' });
+            
+            // Add summary
+            doc.setFontSize(12);
+            doc.text(`Initial Investment: ₹${document.getElementById('investment').value}`, 15, 30);
+            // ... more content
+            
+            // Save the PDF
+            doc.save('SWP_Calculation.pdf');
+            */
+        }
+        
+        // Export to CSV
+        function exportToCsv() {
+            // Add click animation
+            exportCsvBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                exportCsvBtn.style.transform = '';
+            }, 150);
+            
+            const scheduleRows = document.querySelectorAll('#scheduleBody tr');
+            if (scheduleRows.length === 0) {
+                alert('No data to export');
+                return;
+            }
+            
+            // CSV header
+            let csv = 'Period,Year,Withdrawal,Tax,Net Withdrawal,Interest,Corpus\n';
+            
+            // Add data rows
+            scheduleRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = Array.from(cells).map(cell => {
+                    // Remove ₹ symbol and commas for proper CSV formatting
+                    return cell.textContent.replace(/₹|,/g, '');
+                });
+                csv += rowData.join(',') + '\n';
+            });
+            
+            // Create blob and download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            saveAs(blob, 'SWP_Schedule.csv');
+        }
+        
+        // Save calculation to history
+        function saveToHistory(data) {
+            let history = JSON.parse(localStorage.getItem('swpHistory')) || [];
+            
+            // Add new calculation to history
+            history.unshift({
+                id: Date.now(),
+                title: `SWP Calculation - ${new Date().toLocaleString()}`,
+                data: data
+            });
+            
+            // Keep only last 10 calculations
+            if (history.length > 10) {
+                history = history.slice(0, 10);
+            }
+            
+            localStorage.setItem('swpHistory', JSON.stringify(history));
+            loadHistory();
+        }
+        
+        // Load calculation history
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('swpHistory')) || [];
+            historyList.innerHTML = '';
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p>No saved calculations yet.</p>';
+                return;
+            }
+            
+            history.forEach((item, index) => {
+                setTimeout(() => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.style.animation = 'fadeIn 0.3s ease-out';
+                    historyItem.innerHTML = `
+                        <h3>${item.title}</h3>
+                        <p>Investment: ₹${item.data.investment.toLocaleString('en-IN')} | Duration: ${item.data.duration} years</p>
+                    `;
+                    
+                    historyItem.addEventListener('click', () => {
+                        historyItem.style.animation = 'fadeIn 0.3s ease-out';
+                        loadFromHistory(item.data);
+                    });
+                    
+                    historyList.appendChild(historyItem);
+                }, index * 50);
+            });
+        }
+        
+        // Load calculation from history
+        function loadFromHistory(data) {
+            // Populate form fields from history data
+            document.getElementById('investment').value = data.investment;
+            document.getElementById('frequency').value = data.frequency;
+            document.getElementById('withdrawal').value = data.initialWithdrawal;
+            document.getElementById('duration').value = data.duration;
+            
+            // Inflation
+            inflationCheck.checked = data.inflationEnabled;
+            inflationDetails.classList.toggle('hidden', !data.inflationEnabled);
+            if (data.inflationEnabled) {
+                document.getElementById('inflationRate').value = (data.inflationRate * 100).toFixed(1);
+            }
+            
+            // Tax
+            taxCheck.checked = data.taxEnabled;
+            taxDetails.classList.toggle('hidden', !data.taxEnabled);
+            if (data.taxEnabled) {
+                document.getElementById('taxRate').value = (data.taxRate * 100).toFixed(1);
+            }
+            
+            // Return rates
+            if (data.returnRates.length === 1) {
+                fixedReturn.checked = true;
+                fixedReturnDetails.classList.remove('hidden');
+                variableReturnDetails.classList.add('hidden');
+                document.getElementById('returnRate').value = (data.returnRates[0].rate * 100).toFixed(1);
+            } else {
+                variableReturn.checked = true;
+                fixedReturnDetails.classList.add('hidden');
+                variableReturnDetails.classList.remove('hidden');
+                
+                // Clear existing rate periods
+                ratePeriods.innerHTML = '';
+                
+                // Add rate periods from history
+                data.returnRates.forEach(rate => {
+                    const period = document.createElement('div');
+                    period.className = 'rate-period';
+                    period.innerHTML = `
+                        <input type="number" class="rate-from" placeholder="From year" min="0" step="1" value="${rate.fromYear}">
+                        <input type="number" class="rate-to" placeholder="To year" min="1" step="1" value="${rate.toYear}">
+                        <input type="number" class="rate-value" placeholder="Rate %" min="0" max="30" step="0.1" value="${(rate.rate * 100).toFixed(1)}">
+                        <button class="danger remove-rate">×</button>
+                    `;
+                    ratePeriods.appendChild(period);
+                    
+                    // Add event listener to remove button
+                    period.querySelector('.remove-rate').addEventListener('click', removeRatePeriod);
+                });
+            }
+            
+            // Display results
+            displayResults(
+                data.schedule,
+                data.investment,
+                data.totalWithdrawals,
+                data.totalInterest,
+                data.totalTax,
+                data.finalCorpus,
+                data.depletedPeriod,
+                data.duration * data.frequency
+            );
+            
+            // Switch to summary tab
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            document.querySelector('.tab[data-tab="summary"]').classList.add('active');
+            document.getElementById('summary').classList.add('active');
+        }
+        
+        // Reset the form
+        function resetForm() {
+            // Add click animation
+            resetBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                resetBtn.style.transform = '';
+            }, 150);
+            
+            document.getElementById('investment').value = '';
+            document.getElementById('frequency').value = '12';
+            document.getElementById('withdrawal').value = '';
+            document.getElementById('duration').value = '';
+            
+            // Reset inflation
+            inflationCheck.checked = false;
+            inflationDetails.classList.add('hidden');
+            document.getElementById('inflationRate').value = '6';
+            
+            // Reset tax
+            taxCheck.checked = false;
+            taxDetails.classList.add('hidden');
+            document.getElementById('taxRate').value = '10';
+            
+            // Reset return rates
+            fixedReturn.checked = true;
+            fixedReturnDetails.classList.remove('hidden');
+            variableReturnDetails.classList.add('hidden');
+            document.getElementById('returnRate').value = '8';
+            
+            // Reset variable rates to default
+            ratePeriods.innerHTML = `
+                <div class="rate-period">
+                    <input type="number" class="rate-from" placeholder="From year" min="0" step="1" value="0">
+                    <input type="number" class="rate-to" placeholder="To year" min="1" step="1" value="5">
+                    <input type="number" class="rate-value" placeholder="Rate %" min="0" max="30" step="0.1" value="8">
+                    <button class="danger remove-rate">×</button>
+                </div>
+                <div class="rate-period">
+                    <input type="number" class="rate-from" placeholder="From year" min="0" step="1" value="5">
+                    <input type="number" class="rate-to" placeholder="To year" min="1" step="1" value="10">
+                    <input type="number" class="rate-value" placeholder="Rate %" min="0" max="30" step="0.1" value="7">
+                    <button class="danger remove-rate">×</button>
+                </div>
+            `;
+            
+            // Add event listeners to new remove buttons
+            document.querySelectorAll('.remove-rate').forEach(button => {
+                button.addEventListener('click', removeRatePeriod);
+            });
+            
+            // Hide results
+            results.classList.add('hidden');
+        }
+        
+        // Switch between tabs
+        function switchTab() {
+            const tabId = this.getAttribute('data-tab');
+            
+            // Update active tab
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update active content
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                }
+            });
+        }
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

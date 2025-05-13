@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced SWP Calculator</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         :root {
@@ -17,7 +16,6 @@
             --dark-gray: #333;
             --border-radius: 8px;
             --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --animation-duration: 0.3s;
         }
         
         * {
@@ -43,7 +41,7 @@
             background-color: white;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            animation: fadeInDown var(--animation-duration) ease-out;
+            animation: fadeIn 0.5s ease-out;
         }
         
         h1 {
@@ -70,13 +68,7 @@
             box-shadow: var(--box-shadow);
             padding: 20px;
             margin-bottom: 20px;
-            animation: fadeIn var(--animation-duration) ease-out;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.4s ease-out;
         }
         
         .card h2 {
@@ -89,7 +81,7 @@
         
         .form-group {
             margin-bottom: 15px;
-            animation: fadeIn var(--animation-duration) ease-out;
+            animation: fadeIn 0.6s ease-out;
         }
         
         label {
@@ -105,14 +97,14 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 16px;
-            transition: all var(--animation-duration) ease;
+            transition: all 0.3s;
         }
         
         input:focus, select:focus {
             border-color: var(--primary-color);
             outline: none;
             box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
-            transform: scale(1.01);
+            transform: translateY(-1px);
         }
         
         .input-group {
@@ -144,35 +136,16 @@
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
-            transition: all var(--animation-duration) ease;
+            transition: all 0.3s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        button::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.5);
-            opacity: 0;
-            border-radius: 100%;
-            transform: scale(1, 1) translate(-50%);
-            transform-origin: 50% 50%;
-        }
-        
-        button:focus:not(:active)::after {
-            animation: ripple 1s ease-out;
         }
         
         button:hover {
             background-color: #3367d6;
             transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
         button:active {
@@ -229,7 +202,7 @@
             cursor: pointer;
             border-bottom: 3px solid transparent;
             font-weight: 600;
-            transition: all var(--animation-duration) ease;
+            transition: all 0.3s;
         }
         
         .tab:hover {
@@ -243,7 +216,7 @@
         
         .tab-content {
             display: none;
-            animation: fadeIn var(--animation-duration) ease-out;
+            animation: fadeIn 0.5s ease-out;
         }
         
         .tab-content.active {
@@ -253,21 +226,20 @@
         #chart-container {
             height: 300px;
             margin-bottom: 20px;
-            animation: fadeIn var(--animation-duration) ease-out;
+            animation: fadeIn 0.8s ease-out;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            animation: fadeIn var(--animation-duration) ease-out;
+            animation: fadeIn 0.7s ease-out;
         }
         
         th, td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
-            transition: background-color var(--animation-duration) ease;
         }
         
         th {
@@ -275,8 +247,13 @@
             font-weight: 600;
         }
         
+        tr {
+            transition: all 0.2s;
+        }
+        
         tr:hover {
             background-color: rgba(66, 133, 244, 0.05);
+            transform: translateX(4px);
         }
         
         .warning {
@@ -289,7 +266,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            animation: fadeIn var(--animation-duration) ease-out;
+            animation: shake 0.5s ease-in-out;
         }
         
         .warning svg {
@@ -306,7 +283,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            animation: fadeIn var(--animation-duration) ease-out;
+            animation: pulse 2s infinite;
         }
         
         .success svg {
@@ -318,7 +295,6 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
-            animation: fadeIn var(--animation-duration) ease-out;
         }
         
         .summary-card {
@@ -327,12 +303,12 @@
             box-shadow: var(--box-shadow);
             padding: 15px;
             text-align: center;
-            transition: all var(--animation-duration) ease;
+            transition: all 0.3s;
         }
         
         .summary-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
         
         .summary-card h3 {
@@ -354,12 +330,12 @@
             padding: 15px;
             margin-bottom: 15px;
             cursor: pointer;
-            transition: all var(--animation-duration) ease;
+            transition: all 0.3s;
         }
         
         .history-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
         }
         
         .history-item h3 {
@@ -373,13 +349,13 @@
         }
         
         .hidden {
-            display: none !important;
+            display: none;
         }
         
         .loading {
             text-align: center;
             padding: 20px;
-            animation: fadeIn var(--animation-duration) ease-out;
+            animation: fadeIn 0.3s ease-out;
         }
         
         .spinner {
@@ -413,7 +389,7 @@
             left: 50%;
             margin-left: -100px;
             opacity: 0;
-            transition: opacity var(--animation-duration) ease;
+            transition: opacity 0.3s;
             font-size: 0.8rem;
             font-weight: normal;
         }
@@ -432,7 +408,7 @@
             gap: 10px;
             margin-bottom: 10px;
             align-items: center;
-            animation: fadeIn var(--animation-duration) ease-out;
+            animation: fadeIn 0.5s ease-out;
         }
         
         .rate-period input {
@@ -442,89 +418,39 @@
         .rate-period button {
             padding: 8px 12px;
         }
-        
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        
-        @keyframes fadeInDown {
-            from {
+
+        @keyframes slideUp {
+            from { 
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateY(20px);
             }
-            to {
+            to { 
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        @keyframes ripple {
-            0% {
-                transform: scale(0, 0);
-                opacity: 1;
-            }
-            20% {
-                transform: scale(25, 25);
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-                transform: scale(40, 40);
-            }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
-        
-        @keyframes bounceIn {
-            from, 20%, 40%, 60%, 80%, to {
-                animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
-            }
-            0% {
-                opacity: 0;
-                transform: scale3d(.3, .3, .3);
-            }
-            20% {
-                transform: scale3d(1.1, 1.1, 1.1);
-            }
-            40% {
-                transform: scale3d(.9, .9, .9);
-            }
-            60% {
-                opacity: 1;
-                transform: scale3d(1.03, 1.03, 1.03);
-            }
-            80% {
-                transform: scale3d(.97, .97, .97);
-            }
-            to {
-                opacity: 1;
-                transform: scale3d(1, 1, 1);
-            }
-        }
-        
-        .bounce-in {
-            animation: bounceIn 0.75s;
-        }
-        
-        .pulse {
-            animation: pulse 1.5s infinite;
-        }
-        
+
         @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -668,7 +594,7 @@
             </div>
             
             <div class="button-group">
-                <button id="calculateBtn" class="primary pulse">Calculate SWP</button>
+                <button id="calculateBtn" class="primary">Calculate SWP</button>
                 <button id="resetBtn" class="danger">Reset</button>
             </div>
         </div>
@@ -724,7 +650,6 @@
                         </div>
                         
                         <div class="button-group">
-                            <button id="exportPdfBtn" class="secondary">Export to PDF</button>
                             <button id="exportCsvBtn" class="secondary">Export to CSV</button>
                         </div>
                     </div>
@@ -734,7 +659,18 @@
                             <label for="scheduleFilter">Filter by Year:</label>
                             <select id="scheduleFilter">
                                 <option value="all">All Years</option>
-                            </select>
+                            <!-- Years will be added dynamically -->
+                            <option value="1">Year 1</option>
+                                <option value="2">Year 2</option>
+                                <option value="3">Year 3</option>
+                                <option value="4">Year 4</option>
+                                <option value="5">Year 5</option>
+                                <option value="6">Year 6</option>
+                                <option value="7">Year 7</option>
+                                <option value="8">Year 8</option>
+                                <option value="9">Year 9</option>
+                                <option value="10">Year 10</option>
+                        </select>
                         </div>
                         
                         <div style="overflow-x: auto;">
@@ -787,68 +723,60 @@
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
         const scheduleFilter = document.getElementById('scheduleFilter');
-        const exportPdfBtn = document.getElementById('exportPdfBtn');
         const exportCsvBtn = document.getElementById('exportCsvBtn');
         const historyList = document.getElementById('historyList');
         
         // Chart variables
         let corpusChart;
-        
+        let currentSchedule = [];
+
         // Initialize the app
-        function init() {
+        document.addEventListener('DOMContentLoaded', function() {
             // Set up event listeners
             setupEventListeners();
             
-            // Add animation to the calculate button
-            calculateBtn.classList.add('pulse');
-            
             // Load any saved history
             loadHistory();
-        }
-        
-        // Set up all event listeners
+        });
+
         function setupEventListeners() {
-            inflationCheck.addEventListener('change', toggleInflationDetails);
-            taxCheck.addEventListener('change', toggleTaxDetails);
-            fixedReturn.addEventListener('change', toggleReturnType);
-            variableReturn.addEventListener('change', toggleReturnType);
-            addRatePeriod.addEventListener('click', addRatePeriodHandler);
-            calculateBtn.addEventListener('click', calculateSWP);
-            resetBtn.addEventListener('click', resetForm);
+            inflationCheck.addEventListener('change', function() {
+                inflationDetails.classList.toggle('hidden', !this.checked);
+            });
+            
+            taxCheck.addEventListener('change', function() {
+                taxDetails.classList.toggle('hidden', !this.checked);
+            });
+            
+            fixedReturn.addEventListener('change', function() {
+                fixedReturnDetails.classList.remove('hidden');
+                variableReturnDetails.classList.add('hidden');
+            });
+            
+            variableReturn.addEventListener('change', function() {
+                fixedReturnDetails.classList.add('hidden');
+                variableReturnDetails.classList.remove('hidden');
+            });
+            
+            addRatePeriod.addEventListener('click', addNewRatePeriod);
             
             // Add event listeners to existing remove buttons
             document.querySelectorAll('.remove-rate').forEach(button => {
                 button.addEventListener('click', removeRatePeriod);
             });
             
-            // Tab switching
+            calculateBtn.addEventListener('click', calculateSWP);
+            resetBtn.addEventListener('click', resetForm);
+            
             tabs.forEach(tab => {
                 tab.addEventListener('click', switchTab);
             });
             
             scheduleFilter.addEventListener('change', filterSchedule);
-            exportPdfBtn.addEventListener('click', exportToPdf);
             exportCsvBtn.addEventListener('click', exportToCsv);
         }
-        
-        // Toggle inflation details visibility
-        function toggleInflationDetails() {
-            inflationDetails.classList.toggle('hidden', !inflationCheck.checked);
-        }
-        
-        // Toggle tax details visibility
-        function toggleTaxDetails() {
-            taxDetails.classList.toggle('hidden', !taxCheck.checked);
-        }
-        
-        // Toggle between fixed and variable return types
-        function toggleReturnType() {
-            fixedReturnDetails.classList.toggle('hidden', !fixedReturn.checked);
-            variableReturnDetails.classList.toggle('hidden', fixedReturn.checked);
-        }
-        
-        // Add a new rate period
-        function addRatePeriodHandler() {
+
+        function addNewRatePeriod() {
             const lastPeriod = ratePeriods.lastElementChild;
             const lastToYear = lastPeriod.querySelector('.rate-to').value;
             
@@ -865,32 +793,19 @@
             // Add event listener to new remove button
             newPeriod.querySelector('.remove-rate').addEventListener('click', removeRatePeriod);
         }
-        
-        // Remove a rate period
+
         function removeRatePeriod() {
             if (ratePeriods.children.length > 1) {
-                this.parentElement.classList.add('hidden');
-                setTimeout(() => {
-                    ratePeriods.removeChild(this.parentElement);
-                }, 300); // Match this with animation duration
+                this.parentElement.remove();
             } else {
                 alert('You need at least one rate period');
             }
         }
-        
-        // Main calculation function
+
         function calculateSWP() {
-            // Show loading animation
+            // Show loading
             results.classList.add('hidden');
             loading.classList.remove('hidden');
-            
-            // Add click animation to button
-            calculateBtn.classList.remove('pulse');
-            calculateBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                calculateBtn.style.transform = '';
-                calculateBtn.classList.add('pulse');
-            }, 150);
             
             // Use setTimeout to allow UI to update before heavy calculation
             setTimeout(() => {
@@ -927,9 +842,24 @@
                         returnRates.sort((a, b) => a.fromYear - b.fromYear);
                         
                         // Validate coverage
-                        if (returnRates.length === 0 || returnRates[0].fromYear > 0 || 
-                            returnRates[returnRates.length - 1].toYear < duration) {
-                            throw new Error('Return rate periods must cover the entire investment duration');
+                        let fullCoverage = true;
+                        if (returnRates.length === 0 || returnRates[0].fromYear > 0) {
+                            fullCoverage = false;
+                        }
+                        
+                        for (let i = 0; i < returnRates.length - 1; i++) {
+                            if (returnRates[i].toYear < returnRates[i+1].fromYear) {
+                                fullCoverage = false;
+                                break;
+                            }
+                        }
+                        
+                        if (returnRates.length > 0 && returnRates[returnRates.length - 1].toYear < duration) {
+                            fullCoverage = false;
+                        }
+                        
+                        if (!fullCoverage) {
+                            throw new Error('Return rate periods must cover the entire investment duration without gaps');
                         }
                     }
                     
@@ -946,11 +876,6 @@
                         throw new Error('Please enter a valid investment duration');
                     }
                     
-                    if (initialWithdrawal * frequency > investment * 0.1) {
-                        // Warning but not error - just inform user
-                        console.warn('Withdrawal amount seems high compared to investment');
-                    }
-                    
                     // Calculate
                     let corpus = investment;
                     const periods = duration * frequency;
@@ -959,12 +884,6 @@
                     let totalWithdrawals = 0;
                     let totalInterest = 0;
                     let totalTax = 0;
-                    
-                    // Prepare year filter options
-                    scheduleFilter.innerHTML = '<option value="all">All Years</option>';
-                    for (let y = 1; y <= duration; y++) {
-                        scheduleFilter.innerHTML += `<option value="${y}">Year ${y}</option>`;
-                    }
                     
                     for (let i = 1; i <= periods; i++) {
                         // Calculate current period (0-based)
@@ -1023,13 +942,11 @@
                         }
                     }
                     
-                    // Display results with animation
-                    setTimeout(() => {
-                        displayResults(schedule, investment, totalWithdrawals, totalInterest, totalTax, corpus, depletedPeriod, periods);
-                        loading.classList.add('hidden');
-                        results.classList.remove('hidden');
-                        results.classList.add('bounce-in');
-                    }, 100);
+                    // Store the current schedule for export
+                    currentSchedule = schedule;
+                    
+                    // Display results
+                    displayResults(schedule, investment, totalWithdrawals, totalInterest, totalTax, corpus, depletedPeriod, periods);
                     
                     // Save to history
                     saveToHistory({
@@ -1052,37 +969,30 @@
                     });
                     
                 } catch (error) {
-                    loading.classList.add('hidden');
                     alert(error.message);
                     console.error(error);
+                } finally {
+                    loading.classList.add('hidden');
                 }
             }, 100);
         }
         
-        // Display calculation results
         function displayResults(schedule, investment, totalWithdrawals, totalInterest, totalTax, corpus, depletedPeriod, totalPeriods) {
-            // Update summary cards with animation
+            // Show results section
+            results.classList.remove('hidden');
+            
+            // Update summary cards
             document.getElementById('summaryInitial').textContent = `₹${investment.toLocaleString('en-IN')}`;
             document.getElementById('summaryWithdrawals').textContent = `₹${totalWithdrawals.toLocaleString('en-IN')}`;
             document.getElementById('summaryCorpus').textContent = `₹${corpus.toLocaleString('en-IN')}`;
             document.getElementById('summaryInterest').textContent = `₹${totalInterest.toLocaleString('en-IN')}`;
-            
-            // Animate summary cards
-            document.querySelectorAll('.summary-card').forEach((card, index) => {
-                setTimeout(() => {
-                    card.style.animation = 'fadeInDown 0.4s ease-out';
-                    setTimeout(() => {
-                        card.style.animation = '';
-                    }, 400);
-                }, index * 100);
-            });
             
             // Show warning/success message
             const warningDiv = document.getElementById('resultWarning');
             const successDiv = document.getElementById('resultSuccess');
             
             if (depletedPeriod) {
-                const years = (depletedPeriod / frequency).toFixed(1);
+                const years = (depletedPeriod / schedule[0].frequency).toFixed(1);
                 warningDiv.classList.remove('hidden');
                 successDiv.classList.add('hidden');
                 document.getElementById('warningText').textContent = 
@@ -1091,7 +1001,7 @@
                 warningDiv.classList.add('hidden');
                 successDiv.classList.remove('hidden');
                 document.getElementById('successText').textContent = 
-                    `Your corpus will last for the entire ${totalPeriods} withdrawal periods (${duration} years).`;
+                    `Your corpus will last for the entire ${totalPeriods} withdrawal periods (${schedule[0].duration} years).`;
             }
             
             // Update schedule table
@@ -1101,34 +1011,24 @@
             createChart(schedule);
         }
         
-        // Update the withdrawal schedule table
         function updateScheduleTable(schedule) {
             const tbody = document.getElementById('scheduleBody');
             tbody.innerHTML = '';
             
-            schedule.forEach((period, index) => {
-                setTimeout(() => {
-                    const row = document.createElement('tr');
-                    row.style.animation = 'fadeIn 0.3s ease-out';
-                    row.innerHTML = `
-                        <td>${period.period}</td>
-                        <td>₹${period.withdrawal.toFixed(2)}</td>
-                        <td>₹${period.tax.toFixed(2)}</td>
-                        <td>₹${period.netWithdrawal.toFixed(2)}</td>
-                        <td>₹${period.interest.toFixed(2)}</td>
-                        <td>₹${period.corpus.toFixed(2)}</td>
-                    `;
-                    tbody.appendChild(row);
-                    
-                    // Remove animation after it completes
-                    setTimeout(() => {
-                        row.style.animation = '';
-                    }, 300);
-                }, index * 20); // Stagger the animations
+            schedule.forEach(period => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${period.period}</td>
+                    <td>₹${period.withdrawal.toFixed(2)}</td>
+                    <td>₹${period.tax.toFixed(2)}</td>
+                    <td>₹${period.netWithdrawal.toFixed(2)}</td>
+                    <td>₹${period.interest.toFixed(2)}</td>
+                    <td>₹${period.corpus.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
             });
         }
         
-        // Filter schedule by year
         function filterSchedule() {
             const year = scheduleFilter.value;
             const rows = document.querySelectorAll('#scheduleBody tr');
@@ -1136,21 +1036,14 @@
             rows.forEach(row => {
                 if (year === 'all') {
                     row.style.display = '';
-                    row.style.animation = 'fadeIn 0.3s ease-out';
                 } else {
                     const rowPeriod = parseInt(row.cells[0].textContent);
-                    const frequency = parseInt(document.getElementById('frequency').value);
-                    const rowYear = Math.ceil(rowPeriod / frequency);
-                    const display = parseInt(year) >= rowYear ? '' : 'none';
-                    row.style.display = display;
-                    if (display === '') {
-                        row.style.animation = 'fadeIn 0.3s ease-out';
-                    }
+                    const rowYear = Math.ceil(rowPeriod / currentSchedule[0].frequency);
+                    row.style.display = rowYear <= parseInt(year) ? '' : 'none';
                 }
             });
         }
         
-        // Create the corpus chart
         function createChart(schedule) {
             const ctx = document.getElementById('corpusChart').getContext('2d');
             
@@ -1192,10 +1085,6 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: {
-                        duration: 1000,
-                        easing: 'easeOutQuart'
-                    },
                     scales: {
                         y: {
                             type: 'linear',
@@ -1239,66 +1128,42 @@
             });
         }
         
-        // Export to PDF
-        function exportToPdf() {
-            // Add click animation
-            exportPdfBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                exportPdfBtn.style.transform = '';
-            }, 150);
-            
-            alert('PDF export functionality would be implemented here with jsPDF');
-            /*
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Add title
-            doc.setFontSize(18);
-            doc.text('SWP Calculation Report', 105, 15, { align: 'center' });
-            
-            // Add summary
-            doc.setFontSize(12);
-            doc.text(`Initial Investment: ₹${document.getElementById('investment').value}`, 15, 30);
-            // ... more content
-            
-            // Save the PDF
-            doc.save('SWP_Calculation.pdf');
-            */
-        }
-        
-        // Export to CSV
         function exportToCsv() {
-            // Add click animation
-            exportCsvBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                exportCsvBtn.style.transform = '';
-            }, 150);
-            
-            const scheduleRows = document.querySelectorAll('#scheduleBody tr');
-            if (scheduleRows.length === 0) {
-                alert('No data to export');
+            if (currentSchedule.length === 0) {
+                alert('No data to export. Please calculate first.');
                 return;
             }
             
             // CSV header
-            let csv = 'Period,Year,Withdrawal,Tax,Net Withdrawal,Interest,Corpus\n';
+            let csv = 'Period,Year,Withdrawal (₹),Tax (₹),Net Withdrawal (₹),Interest (₹),Corpus (₹)\n';
             
             // Add data rows
-            scheduleRows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                const rowData = Array.from(cells).map(cell => {
-                    // Remove ₹ symbol and commas for proper CSV formatting
-                    return cell.textContent.replace(/₹|,/g, '');
-                });
-                csv += rowData.join(',') + '\n';
+            currentSchedule.forEach(period => {
+                csv += `${period.period},${period.year},${period.withdrawal.toFixed(2)},${period.tax.toFixed(2)},${period.netWithdrawal.toFixed(2)},${period.interest.toFixed(2)},${period.corpus.toFixed(2)}\n`;
             });
             
             // Create blob and download
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            saveAs(blob, 'SWP_Schedule.csv');
+            
+            // For mobile compatibility
+            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                // For IE/Edge
+                window.navigator.msSaveOrOpenBlob(blob, 'SWP_Schedule.csv');
+            } else {
+                // For other browsers
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'SWP_Schedule.csv';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+            }
         }
         
-        // Save calculation to history
         function saveToHistory(data) {
             let history = JSON.parse(localStorage.getItem('swpHistory')) || [];
             
@@ -1318,7 +1183,6 @@
             loadHistory();
         }
         
-        // Load calculation history
         function loadHistory() {
             const history = JSON.parse(localStorage.getItem('swpHistory')) || [];
             historyList.innerHTML = '';
@@ -1328,27 +1192,22 @@
                 return;
             }
             
-            history.forEach((item, index) => {
-                setTimeout(() => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'history-item';
-                    historyItem.style.animation = 'fadeIn 0.3s ease-out';
-                    historyItem.innerHTML = `
-                        <h3>${item.title}</h3>
-                        <p>Investment: ₹${item.data.investment.toLocaleString('en-IN')} | Duration: ${item.data.duration} years</p>
-                    `;
-                    
-                    historyItem.addEventListener('click', () => {
-                        historyItem.style.animation = 'fadeIn 0.3s ease-out';
-                        loadFromHistory(item.data);
-                    });
-                    
-                    historyList.appendChild(historyItem);
-                }, index * 50);
+            history.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <h3>${item.title}</h3>
+                    <p>Investment: ₹${item.data.investment.toLocaleString('en-IN')} | Duration: ${item.data.duration} years</p>
+                `;
+                
+                historyItem.addEventListener('click', () => {
+                    loadFromHistory(item.data);
+                });
+                
+                historyList.appendChild(historyItem);
             });
         }
         
-        // Load calculation from history
         function loadFromHistory(data) {
             // Populate form fields from history data
             document.getElementById('investment').value = data.investment;
@@ -1420,14 +1279,23 @@
             document.getElementById('summary').classList.add('active');
         }
         
-        // Reset the form
-        function resetForm() {
-            // Add click animation
-            resetBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                resetBtn.style.transform = '';
-            }, 150);
+        function switchTab() {
+            const tabId = this.getAttribute('data-tab');
             
+            // Update active tab
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update active content
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                }
+            });
+        }
+        
+        function resetForm() {
             document.getElementById('investment').value = '';
             document.getElementById('frequency').value = '12';
             document.getElementById('withdrawal').value = '';
@@ -1473,26 +1341,6 @@
             // Hide results
             results.classList.add('hidden');
         }
-        
-        // Switch between tabs
-        function switchTab() {
-            const tabId = this.getAttribute('data-tab');
-            
-            // Update active tab
-            tabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Update active content
-            tabContents.forEach(content => {
-                content.classList.remove('active');
-                if (content.id === tabId) {
-                    content.classList.add('active');
-                }
-            });
-        }
-        
-        // Initialize the app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
